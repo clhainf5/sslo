@@ -22,8 +22,6 @@ services:
       - "--config=/etc/otel-collector-observability-app.yaml"
       # Add the ast app receivers / exporters / processors / pipelines
       - "--config=/etc/otel-collector-config/otel-collector-config-extras.yaml"
-    # Relative to the AppFramework/stacks/observability-app compose file
-    env_file: ["../../../.env.device-secrets"]
 
   grafana:
     # All volume paths are relative to the service compose file in AppFramework/stacks/observability-app
