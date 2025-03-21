@@ -65,13 +65,16 @@ Clone the repo or download source tarball from the [release](https://github.com/
 # Clone the repo
 git clone https://github.com/clhainf5/sslo 
 cd sslo
+# If AppFramework is still private:
+# Generate a PAT with Read permission in f5observabilityhub/AppFramework on "Contents" 
+git config submodule.AppFramework.url https://USERNAME:PAT@github.com:/F5ObservabilityHub/AppFramework # Only required if AppFramework is still private:
 # This must be run before anything else to fully initialize the project layout
 # The files listed below will not exist at the specified paths until this is run.
 make init
-# Create testing certificates to use on the syslog receiver listener
-make test-certificates
-# Edit env files and config files as required by the project #TODO - list these out
-vi .env
+# Create testing certs to use on the syslog receiver listener
+make test-certs
+# Depending on your docker environment you may need to allow the user in the otel collector (10001) access to it
+sudo chown 10001 services/otel_collector/ssl/key.pem
 # Start the tool
 make start
 # Load generator

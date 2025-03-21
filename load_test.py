@@ -141,15 +141,15 @@ try:
     current_rate = INITIAL_RATE
     next_increase_time = start + INTERVAL
     batch_count = 0
-    now = f"{datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','')}Z"
+    nowish = f"{datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','')}Z"
     while True:
         for data in send_data:
             count +=1
             batch_count += 1
-            send = str.encode(f"<118>1 {now} 17-1-demo.f5kc.com F5-API-Discovery - - - {data}")
+            send = str.encode(f"<118>1 {nowish} 17-1-demo.f5kc.com F5-API-Discovery - - - {data}")
             conn.send(send)
             if count % 100000 == 0 or batch_count >= current_rate:
-                now = f"{datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','')}Z"
+                nowish = f"{datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','')}Z"
                 if batch_count >= current_rate:
                     time.sleep(1)
                 batch_count = 0
