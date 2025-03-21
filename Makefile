@@ -113,3 +113,14 @@ configure: check-appframework ## Run the AST configuration helper script to gene
 	echo "🚀 Running AST Configuration helper via $(CONTAINER_CLITOOL)..."; \
 	$(CONTAINER_CLITOOL) run --rm -it -w /app -v $(shell pwd):/app --entrypoint /app/src/bin/init_entrypoint.sh python:3.12.6-slim-bookworm --generate-config
 
+.PHONY: test-certs
+test-certs:
+	@echo "Generating self-signed certificates..."
+	@mkdir -p ./services/otel_collector/ssl
+	@openssl genpkey -algorithm RSA -out ./services/otel_collector/ssl/key.pem
+	@openssl req -new -key ./services/otel_collector/ssl/key.pem -out ./services/otel_collector/ssl/cert.csr -subj "/CN=localhost"
+	@openssl x509 -req -in ./services/otel_collector/ssl/cert.csr -signkey ./services/otel_collector/ssl/key.pem -out ./services/otel_collector/ssl/cert.pem
+	@openssl genpkey -algorithm RSA -out ./services/otel_collector/ssl/ca.key
+	@openssl req -x509 -new -key ./services/otel_collector/ssl/ca.key -out ./services/otel_collector/ssl/ca.pem -days 365 -subj "/CN=Test CA"
+	@rm -f ./services/otel_collector/ssl/ca.key ./services/otel_collector/ssl/cert.csr
+	@echo "Certificates generated at ./services/otel_collector/ssl/"

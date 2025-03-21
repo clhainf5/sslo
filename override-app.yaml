@@ -20,12 +20,23 @@ services:
       # These don't merge with the base files, re-define here
       - "--config=/etc/otel-collector.yaml"
       - "--config=/etc/otel-collector-observability-app.yaml"
+      - "--config=/etc/otel-collector-config/defaults/sslo-logging-config.yaml"
       # Add the ast app receivers / exporters / processors / pipelines
       - "--config=/etc/otel-collector-config/otel-collector-config-extras.yaml"
+    ports:
+      - 514:54526/udp
+      - 6514:54526
+
+  clickhouse:
+    volumes:
+      # Add script to intiialize null and results tables, plus materialized view
+      - ../../../services/clickhouse/docker-entrypoint-initdb.d/init-sslo-db.sh:/docker-entrypoint-initdb.d/init-sslo-db.sh
 
   grafana:
     # All volume paths are relative to the service compose file in AppFramework/stacks/observability-app
     volumes:
+      - ../../../services/grafana/provisioning/dashboards/sslo:/etc/dashboards/sslo
+      - ../../../services/grafana/provisioning/dashboards/dashboards-sslo.yaml:/etc/grafana/provisioning/dashboards/dashboards-sslo.yaml
       - ../../../services/grafana/provisioning/datasources/datasource_extras.yaml:/etc/grafana/provisioning/datasources/datasource_extras.yaml
     # Relative to the AppFramework/stacks/observability-app compose file
     env_file: ["../../../.env"]

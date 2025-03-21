@@ -1,18 +1,19 @@
-# AppFramework Temaplte
+# SSLO Via AppFramework POC
 
 ## Overview
-This template is meant as a starting point for developers building on top of AppFramework.
+This is a POC repo for providing SSLO analysis on an external box with components
+that are compatible with AST.
 
-The remainder of this readme is geared toward the end-user of your app, see the AppFramework Repo
-and DocSite for more developer focused instructions.
-
-Items marked with #TODO below should be updated with your own values.
+![SSLO Overview](./img/sslo.png)
 
 ## Getting Started
 
 ### Prerequisites
 
 #### [Git Client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+#### OpenSSL
+Used for test certificate generation, can skip if using real certs.
 
 #### Docker (or compatible) container environment with compose.
 Installation Instructions:
@@ -62,15 +63,19 @@ Clone the repo or download source tarball from the [release](https://github.com/
 
 ```shell
 # Clone the repo
-git clone #TODO - the repo url
-cd #TODO - the directory created by the above
+git clone https://github.com/clhainf5/sslo 
+cd sslo
 # This must be run before anything else to fully initialize the project layout
 # The files listed below will not exist at the specified paths until this is run.
 make init
+# Create testing certificates to use on the syslog receiver listener
+make test-certificates
 # Edit env files and config files as required by the project #TODO - list these out
 vi .env
 # Start the tool
 make start
+# Load generator
+python ./load_test.py
 ```
 
 <details>
@@ -79,8 +84,8 @@ make start
 ```shell
 # Clone the repo
 
-git clone #TODO - the repo url
-cd #TODO - the directory created by the above
+git clone https://github.com/clhainf5/sslo 
+cd sslo
 # Initialize the core AppFramework components
 git submodule init
 git submodule update
@@ -97,6 +102,7 @@ find ./.init/project -type f | while read src; do \
       echo "  ⚠️  $$dest already exists. Skipping copy."; \
     fi \
   done
+# Optional, run the openssl commands in Makefile to generate certificates for collector to use, or provide your own in services/otel_collector/ssl
 # Edit env files and config files as required by the project #TODO - list these out
 vi .env
 # Start the tool
