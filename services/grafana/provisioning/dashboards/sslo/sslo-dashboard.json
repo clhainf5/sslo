@@ -238,11 +238,11 @@
           },
           "pluginVersion": "4.8.2",
           "queryType": "table",
-          "rawSql": "SELECT \n  toStartOfMinute(Timestamp) as bucketed_timestamp,\n  vip,\n  avg(duration) as Value\nFROM \"otel\".\"sslo_logs\"\nWHERE \n  (hostname = '${device_name}' OR '${device_name}' = 'all') AND\n  (sslo_host = '${sslo_host}' OR '${sslo_host}' = 'all') AND\n  (vip = '${virtual_server}' OR '${virtual_server}' = 'all') AND\n  (Timestamp >= $__fromTime AND Timestamp <= $__toTime)\nGROUP BY bucketed_timestamp, vip\nORDER BY bucketed_timestamp DESC",
+          "rawSql": "with qa AS (\n  SELECT \n  toStartOfMinute(Timestamp) as bucketed_timestamp,\n  vip,\n  quantiles(0.5, 0.75, 0.99)(duration) as quants\nFROM \"otel\".\"sslo_logs\"\nWHERE \n  (hostname = '${device_name}' OR '${device_name}' = 'all') AND\n  (sslo_host = '${sslo_host}' OR '${sslo_host}' = 'all') AND\n  (vip = '${virtual_server}' OR '${virtual_server}' = 'all') AND\n  (Timestamp >= $__fromTime AND Timestamp <= $__toTime)\nGROUP BY bucketed_timestamp, vip\nORDER BY bucketed_timestamp DESC\n)\nSELECT\n  qa.bucketed_timestamp AS bucketed_timestamp,\n  qa.vip AS vip,\n  arrayElement(qa.quants, 1) AS p50,\n  arrayElement(qa.quants, 2) AS p75,\n  arrayElement(qa.quants, 3) AS p99\nFROM qa",
           "refId": "A"
         }
       ],
-      "title": "Avg Duration By Virtual Server",
+      "title": "Duration Quantile By Virtual Server",
       "transformations": [
         {
           "id": "prepareTimeSeries",
@@ -2001,6 +2001,6 @@
   "timezone": "browser",
   "title": "SSLO Overview",
   "uid": "begg6frac9728f",
-  "version": 12,
+  "version": 3,
   "weekStart": ""
 }
